@@ -54,9 +54,9 @@
         };
     };
 
-    memory@800000000 {
+    memory@80000000 {
         device_type = "memory";
-        reg = <0x8 0x00000000 0x8 0x00000000>;
+        reg = <0x0 0x80000000 0x0 0x40000000>;
     };
 
     syscon: simdev@100000 {
@@ -78,10 +78,10 @@
         value = <0x5555>;
     };
 
-    plic: interrupt-controller@3000000 {
+    plic: interrupt-controller@c000000 {
         #address-cells = <0>;
         #interrupt-cells = <1>;
-        reg = <0x0 0x03000000 0x0 0x04000000>;
+        reg = <0x0 0x0c000000 0x0 0x04000000>;
         compatible = "sifive,plic-1.0.0", "riscv,plic0";
         interrupt-controller;
         interrupts-extended = <&hart0 0xffffffff>, <&hart0 9>;
@@ -117,7 +117,7 @@
 
     virtio@20000000 {
         compatible = "virtio,mmio";
-        reg = <0x0 0x20000000 0x0 0x1000>;
+        reg = <0x0 14000000 0x0 0x1000>;
         interrupt-parent = <&plic>;
         interrupts = <12>;
     };

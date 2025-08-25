@@ -1,4 +1,5 @@
 #!/bin/env bash
+
 set -euo pipefail
 
 # Get directory of script itself
@@ -13,21 +14,4 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-source "$DIR/../../common/setup.sh"
-TAG=ror_linux_buildroot
-BUILD_DIR="$DIR/../BUILD"
-
-mkdir -p $BUILD_DIR
-
-# Build Linux buildroot
-$CONTAINER_PROGRAM build -t $TAG "$DIR"
-$CONTAINER_PROGRAM run \
-    --rm \
-    $CONTAINER_PROGRAM_FLAGS \
-    $1 \
-	-v "$DIR/../buildroot:/app/buildroot:Z" \
-	-v "$BUILD_DIR:/app/build:Z" \
-    -v "$DIR/../files:/app/files:Z" \
-	-v "$DIR/../bootcode:/app/bootcode:Z" \
-    $TAG \
-	$2
+$DIR/files/scripts/run_container "-it -e FORCE_UNSAFE_CONFIGURE=1" "make -C /app/buildroot O=/app/output all"
