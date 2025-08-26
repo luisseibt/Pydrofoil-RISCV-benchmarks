@@ -12,7 +12,7 @@ all: $(OBJ)
 clean:
 	$(RM) $(OBJ)
 
-${O}/%.dtb: ${O}/%.dts
+${O}/%.dtb: %.dts
 	@mkdir -p ${O}
 	$(DTC) -I dts -O dtb -o $@ $<
 
