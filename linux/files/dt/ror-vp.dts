@@ -115,9 +115,9 @@
         period = <0>;
     };
 
-    virtio@20000000 {
+    virtio@14000000 {
         compatible = "virtio,mmio";
-        reg = <0x0 14000000 0x0 0x1000>;
+        reg = <0x0 0x14000000 0x0 0x1000>;
         interrupt-parent = <&plic>;
         interrupts = <12>;
     };
