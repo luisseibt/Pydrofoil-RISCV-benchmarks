@@ -30,5 +30,6 @@ $CONTAINER_PROGRAM run \
     -v "$BUILD_DIR:/app/output:Z" \
     -v "$PROJECT_ROOT/linux/files:/app/files:Z" \
     -v "$PROJECT_ROOT/linux/bootcode:/app/bootcode:Z" \
+    -v "$PROJECT_ROOT/linux/apps:/app/apps:Z" \
     $TAG \
     bash -c "$2"

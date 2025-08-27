@@ -1,0 +1,10 @@
+# Ensure sourced
+(return 0 2>/dev/null) || {
+  echo "This script must be sourced, not run directly."
+  exit 1
+}
+
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+export SIMDEV_BASE=0x00100000
+export LD_PRELOAD=$SCRIPT_DIR/lib/libhclktime.so:$LD_PRELOAD

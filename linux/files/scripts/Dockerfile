@@ -31,5 +31,6 @@ RUN apt-get update \
         libssl-dev \
         libelf-dev \
         bc \
-        wget
+        wget \
+        cmake
 WORKDIR /app/build

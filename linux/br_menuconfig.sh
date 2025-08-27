@@ -1,5 +1,4 @@
 #!/bin/env bash
-
 set -euo pipefail
 
 # Get directory of script itself
