@@ -1,18 +1,25 @@
 O   ?= .
 CPP ?= cpp
 DTC ?= dtc
-NVDLA ?= 0
 
 CPPFLAGS := -nostdinc -undef -x assembler-with-cpp
 
-OBJ := ${O}/ror-vp.dtb
+OBJ := ${O}/ror-vp-x1.dtb ${O}/ror-vp-x2.dtb
 
 all: $(OBJ)
 
 clean:
 	$(RM) $(OBJ)
 
-${O}/%.dtb: %.dts
+${O}/ror-vp-x1.dts: ror-vp.dts
+	@mkdir -p ${O}
+	$(CPP) $(CPPFLAGS) -D NRCPU=1 -o $@ $<
+
+${O}/ror-vp-x2.dts: ror-vp.dts
+	@mkdir -p ${O}
+	$(CPP) $(CPPFLAGS) -D NRCPU=2 -o $@ $<
+
+${O}/%.dtb: ${O}/%.dts
 	@mkdir -p ${O}
 	$(DTC) -I dts -O dtb -o $@ $<
 
