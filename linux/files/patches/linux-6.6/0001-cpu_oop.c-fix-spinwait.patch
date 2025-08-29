@@ -1,0 +1,16 @@
+--- linux-6.6/arch/riscv/kernel/cpu_ops.c	2025-08-29 09:05:33.141898671 +0200
++++ linux-6.6/arch/riscv/kernel/cpu_ops.c	2025-08-28 16:44:23.586700676 +0200
+@@ -27,11 +27,13 @@
+ void __init cpu_set_ops(int cpuid)
+ {
+ #if IS_ENABLED(CONFIG_RISCV_SBI)
++#ifndef CONFIG_RISCV_BOOT_SPINWAIT
+ 	if (sbi_probe_extension(SBI_EXT_HSM)) {
+ 		if (!cpuid)
+ 			pr_info("SBI HSM extension detected\n");
+ 		cpu_ops[cpuid] = &cpu_ops_sbi;
+ 	} else
+ #endif
++#endif
+ 		cpu_ops[cpuid] = &cpu_ops_spinwait;
+ }

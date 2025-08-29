@@ -15,4 +15,6 @@ if [ -e $BINARIES_DIR/vmlinux ]; then
     riscv64-buildroot-linux-gnu-objcopy -O binary $BINARIES_DIR/vmlinux.elf $BINARIES_DIR/vmlinux.bin
 fi
 
+cp /app/files/vp_config/buildroot.cfg $BINARIES_DIR/buildroot.cfg
+
 echo "post-image.sh done"
