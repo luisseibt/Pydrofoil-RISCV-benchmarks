@@ -12,7 +12,7 @@
     model = "RoR VP";
 
     chosen {
-        bootargs = "root=/dev/vda rootwait debug console=ttyS0";
+        bootargs = "root=/dev/vda rootwait debug console=ttyS0 earlycon";
         stdout-path = "/uart@10000000";
 
         #address-cells = <2>;
