@@ -4,20 +4,18 @@ DTC ?= dtc
 
 CPPFLAGS := -nostdinc -undef -x assembler-with-cpp
 
-OBJ := ${O}/ror-vp-x1.dtb ${O}/ror-vp-x2.dtb
+CPUS := 1 2 4
+
+OBJ := $(addprefix ${O}/ror-vp-x,${CPUS:=.dtb})
 
 all: $(OBJ)
 
 clean:
 	$(RM) $(OBJ)
 
-${O}/ror-vp-x1.dts: ror-vp.dts
+${O}/ror-vp-x%.dts: ror-vp.dts
 	@mkdir -p ${O}
-	$(CPP) $(CPPFLAGS) -D NRCPU=1 -o $@ $<
-
-${O}/ror-vp-x2.dts: ror-vp.dts
-	@mkdir -p ${O}
-	$(CPP) $(CPPFLAGS) -D NRCPU=2 -o $@ $<
+	$(CPP) $(CPPFLAGS) -D NRCPU=$* -o $@ $<
 
 ${O}/%.dtb: ${O}/%.dts
 	@mkdir -p ${O}

@@ -13,4 +13,4 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-$DIR/files/scripts/run_container "-it -e FORCE_UNSAFE_CONFIGURE=1 -e BR2_DEFCONFIG=/app/files/config/br_config" "make -C /app/buildroot O=/app/output defconfig && make -C /app/buildroot O=/app/output all"
+$DIR/files/scripts/run_container "-it -e FORCE_UNSAFE_CONFIGURE=1 -e BR2_DEFCONFIG=/app/files/config/br_config" "make -C /app/buildroot O=/app/build defconfig && make -C /app/buildroot O=/app/build all"

@@ -86,6 +86,68 @@
             };
         };
 #endif
+#if NRCPU > 2
+         cpu@2 {
+            reg = <2>;
+            clock-frequency = <1000000000>; // 1.4GHz
+            compatible = "riscv";
+            device_type = "cpu";
+            d-cache-block-size = <0x40>;
+			d-cache-sets = <0x80>;
+			d-cache-size = <0x8000>;
+			d-tlb-sets = <0x01>;
+			d-tlb-size = <0x20>;
+			i-cache-block-size = <0x40>;
+			i-cache-sets = <0x80>;
+			i-cache-size = <0x8000>;
+			i-tlb-sets = <0x01>;
+			i-tlb-size = <0x20>;
+            mmu-type = "riscv,sv48";
+            riscv,isa = "rv64imafdch_zicsr_zifencei_zba_zbb_sscofpmf";
+            riscv,isa-base = "rv64i";
+            riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "h",
+                                   "zicsr", "zifencei", "zba", "zbb",
+                                   "sscofpmf";
+			tlb-split;
+
+            hart2: interrupt-controller {
+                #interrupt-cells = <1>;
+                compatible = "riscv,cpu-intc";
+                interrupt-controller;
+            };
+        };
+#endif
+#if NRCPU > 3
+         cpu@3 {
+            reg = <3>;
+            clock-frequency = <1000000000>; // 1.4GHz
+            compatible = "riscv";
+            device_type = "cpu";
+            d-cache-block-size = <0x40>;
+			d-cache-sets = <0x80>;
+			d-cache-size = <0x8000>;
+			d-tlb-sets = <0x01>;
+			d-tlb-size = <0x20>;
+			i-cache-block-size = <0x40>;
+			i-cache-sets = <0x80>;
+			i-cache-size = <0x8000>;
+			i-tlb-sets = <0x01>;
+			i-tlb-size = <0x20>;
+            mmu-type = "riscv,sv48";
+            riscv,isa = "rv64imafdch_zicsr_zifencei_zba_zbb_sscofpmf";
+            riscv,isa-base = "rv64i";
+            riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "h",
+                                   "zicsr", "zifencei", "zba", "zbb",
+                                   "sscofpmf";
+			tlb-split;
+
+            hart3: interrupt-controller {
+                #interrupt-cells = <1>;
+                compatible = "riscv,cpu-intc";
+                interrupt-controller;
+            };
+        };
+#endif
     };
 
     memory@80000000 {
@@ -121,6 +183,12 @@
         interrupts-extended = <&hart0 0xffffffff>, <&hart0 9>
 #if NRCPU > 1
                             , <&hart1 0xffffffff>, <&hart1 9>
+#endif
+#if NRCPU > 2
+                            , <&hart2 0xffffffff>, <&hart2 9>
+#endif
+#if NRCPU > 3
+                            , <&hart3 0xffffffff>, <&hart3 9>
 #endif
         ;
         riscv,ndev = <64>;

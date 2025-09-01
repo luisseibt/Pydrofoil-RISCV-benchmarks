@@ -16,9 +16,10 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 PROJECT_ROOT="$DIR/../../.."
 source "$PROJECT_ROOT/common/setup.sh"
 TAG=ror_linux_buildroot
-BUILD_DIR="$PROJECT_ROOT/linux/BUILD"
+BUILD_DIR="$PROJECT_ROOT/linux/build"
+OUT_DIR="$PROJECT_ROOT/images"
 
-mkdir -p $BUILD_DIR
+mkdir -p $BUILD_DIR $OUT_DIR
 
 # Build Linux buildroot
 $CONTAINER_PROGRAM build -t $TAG "$DIR"
@@ -27,9 +28,10 @@ $CONTAINER_PROGRAM run \
     $CONTAINER_PROGRAM_FLAGS \
     $1 \
     -v "$PROJECT_ROOT/linux/buildroot:/app/buildroot:Z" \
-    -v "$BUILD_DIR:/app/output:Z" \
+    -v "$BUILD_DIR:/app/build:Z" \
     -v "$PROJECT_ROOT/linux/files:/app/files:Z" \
     -v "$PROJECT_ROOT/linux/bootcode:/app/bootcode:Z" \
     -v "$PROJECT_ROOT/linux/apps:/app/apps:Z" \
+    -v "$OUT_DIR:/app/output:Z" \
     $TAG \
     bash -c "$2"
