@@ -13,8 +13,8 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-mkdir -p $DIR/BUILD
+mkdir -p $DIR/build
 
-cp $DIR/files/config/br_config $DIR/BUILD/.config
+cp $DIR/files/config/br_config $DIR/build/.config
 $DIR/files/scripts/run_container "-it" "make -C /app/buildroot O=/app/build menuconfig"
-cp $DIR/BUILD/.config $DIR/files/config/br_config
+cp $DIR/build/.config $DIR/files/config/br_config
