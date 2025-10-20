@@ -61,3 +61,11 @@ uint64_t hclk_us() {
 
   return *((uint64_t *)(simdev_instance.base + 0x20));
 }
+
+
+void stop_sim() {
+  if (!simdev_instance.init)
+    return;
+
+  *((uint64_t *)(simdev_instance.base + 0x00)) = 0x01;
+}
