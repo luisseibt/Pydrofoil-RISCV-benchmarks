@@ -21,6 +21,9 @@ OUT_DIR="$PROJECT_ROOT/images"
 
 mkdir -p $BUILD_DIR $OUT_DIR
 
+# ensure overlay dir exists
+mkdir -p "$PROJECT_ROOT/linux/files/overlay"
+
 # Build Linux buildroot
 $CONTAINER_PROGRAM build -t $TAG "$DIR"
 $CONTAINER_PROGRAM run \
