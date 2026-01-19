@@ -17,7 +17,7 @@ LINUX_DIR="/app/build/build/linux-6.6"
 LINUX_DIR_HOST="$DIR/build/build/linux-6.6"
 
 if [ ! -d "${LINUX_DIR_HOST}" ]; then
-	$DIR/files/scripts/run_container "-it -e FORCE_UNSAFE_CONFIGURE=1" "make -C /app/buildroot O=/app/build linux-menuconfig"
+	$DIR/files/scripts/run_container "-it -e FORCE_UNSAFE_CONFIGURE=1 -e BR2_DEFCONFIG=/app/files/config/br_config" "make -C /app/buildroot O=/app/build defconfig && make -C /app/buildroot O=/app/build linux-menuconfig"
 fi;
 
 cp "$DIR/files/config/linux_config" "${LINUX_DIR_HOST}/.config"

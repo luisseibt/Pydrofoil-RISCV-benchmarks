@@ -16,5 +16,5 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 mkdir -p $DIR/build
 
 cp $DIR/files/config/br_config $DIR/build/.config
-$DIR/files/scripts/run_container "-it" "make -C /app/buildroot O=/app/build menuconfig"
+$DIR/files/scripts/run_container "-it -e BR2_DEFCONFIG=/app/files/config/br_config" " make -C /app/buildroot O=/app/build defconfig && make -C /app/buildroot O=/app/build menuconfig"
 cp $DIR/build/.config $DIR/files/config/br_config
