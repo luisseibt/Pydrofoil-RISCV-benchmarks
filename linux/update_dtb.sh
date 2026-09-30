@@ -1,4 +1,13 @@
 #!/bin/env bash
+###############################################################################
+#                                                                             #
+# Copyright 2026 Chiara Ghinami  Nils Bosbach                                 #
+#                                                                             #
+# This software is licensed under the MIT license found in the                #
+# LICENSE file at the root directory of this source tree.                     #
+#                                                                             #
+###############################################################################
+
 set -euo pipefail
 
 # Get directory of script itself
@@ -13,7 +22,7 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-OUT_DIR="$DIR/BUILD/images"
+OUT_DIR="$DIR/../images/buildroot"
 DTS_DIR="$DIR/files/dt"
 
 mkdir -p "$OUT_DIR"

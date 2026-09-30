@@ -1,0 +1,2 @@
+source "$BR2_EXTERNAL_RISCV_APPS_PATH/hello_world/Config.in"
+source "$BR2_EXTERNAL_RISCV_APPS_PATH/hclktime/Config.in"

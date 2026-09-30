@@ -1,0 +1,151 @@
+/*
+ * Device tree for the vcml-pydrofoil virtual platform.
+ */
+
+#ifndef NRCPU
+#error NRCPU undefined
+#endif
+
+#if NRCPU > 1
+#error "the vcml-pydrofoil platform instantiates a single hart"
+#endif
+
+/dts-v1/;
+
+/ {
+    #address-cells = <2>;
+    #size-cells = <2>;
+    compatible = "riscv-virtio";
+    model = "vcml-pydrofoil VP";
+
+    chosen {
+        bootargs = "root=/dev/vda rootwait console=ttyS0 earlycon no4lvl";
+        stdout-path = "/uart@10000000";
+
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+    };
+
+    cpus {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        timebase-frequency = <10000000>; // 10 MHz
+
+        cpu@0 {
+            reg = <0>;
+            clock-frequency = <1000000000>; // 1 GHz
+            compatible = "riscv";
+            device_type = "cpu";
+            d-cache-block-size = <0x40>;
+            d-cache-sets = <0x80>;
+            d-cache-size = <0x8000>;
+            d-tlb-sets = <0x01>;
+            d-tlb-size = <0x20>;
+            i-cache-block-size = <0x40>;
+            i-cache-sets = <0x80>;
+            i-cache-size = <0x8000>;
+            i-tlb-sets = <0x01>;
+            i-tlb-size = <0x20>;
+            mmu-type = "riscv,sv39";
+            riscv,isa = "rv64imafdc_zicsr_zifencei_zba_zbb";
+            riscv,isa-base = "rv64i";
+            riscv,isa-extensions = "i", "m", "a", "f", "d", "c",
+                                   "zicsr", "zifencei", "zba", "zbb";
+            tlb-split;
+
+            hart0: interrupt-controller {
+                #interrupt-cells = <1>;
+                compatible = "riscv,cpu-intc";
+                interrupt-controller;
+            };
+        };
+    };
+
+    memory@80000000 {
+        device_type = "memory";
+        reg = <0x0 0x80000000 0x0 0x20000000>; // 512 MiB
+    };
+
+    syscon: simdev@100000 {
+        compatible = "sifive,test1", "sifive,test0", "syscon";
+        reg = <0x0 0x00100000 0x0 0x1000>;
+    };
+
+    reboot {
+        compatible = "syscon-reboot";
+        regmap = <&syscon>;
+        offset = <0x0>;
+        value = <0x7777>;
+    };
+
+    poweroff {
+        compatible = "syscon-poweroff";
+        regmap = <&syscon>;
+        offset = <0x0>;
+        value = <0x5555>;
+    };
+
+    clint@2000000 {
+        compatible = "sifive,clint0", "riscv,clint0";
+        reg = <0x0 0x02000000 0x0 0x000c0000>;
+        interrupts-extended = <&hart0 3>, <&hart0 7>;
+    };
+
+    plic: interrupt-controller@c000000 {
+        #address-cells = <0>;
+        #interrupt-cells = <1>;
+        reg = <0x0 0x0c000000 0x0 0x04000000>;
+        compatible = "sifive,plic-1.0.0", "riscv,plic0";
+        interrupt-controller;
+        /*
+         * Context 0 = hart0 M-external (OpenSBI), context 1 = hart0
+         * S-external (Linux). The platform binds plic.irqt[0] and
+         * plic.irqt[1] to the core's MEIP and SEIP inputs in that order.
+         */
+        interrupts-extended = <&hart0 11>, <&hart0 9>;
+        riscv,ndev = <64>;
+    };
+
+    uartclk: clk3mhz {
+        compatible = "fixed-clock";
+        #clock-cells = <0>;
+        clock-frequency = <3686400>; /* 3.6864 MHz */
+    };
+
+    ioclk: clk100mhz {
+        compatible = "fixed-clock";
+        #clock-cells = <0>;
+        clock-frequency = <100000000>;
+    };
+
+    /* vcml::serial::uart8250 -- byte registers at offsets 0..7, so the
+     * ns16550a defaults (reg-shift = 0, reg-io-width = 1) apply. */
+    uart0: uart@10000000 {
+        compatible = "ns16550a";
+        clocks = <&uartclk>;
+        /*
+         * OpenSBI reads clock-frequency straight off this node and ignores
+         * the clocks phandle (fdt_parse_uart_node_common)
+         */
+        clock-frequency = <3686400>;
+        reg = <0x0 0x10000000 0x0 0x1000>;
+        interrupt-parent = <&plic>;
+        interrupts = <1>;
+    };
+
+    hwrng0: hwrng@10001000 {
+        compatible = "timeriomem_rng";
+        reg = <0x0 0x10001000 0x0 0x1000>;
+        quality = <1000>;
+        period = <0>;
+    };
+
+    virtio@14000000 {
+        compatible = "virtio,mmio";
+        reg = <0x0 0x14000000 0x0 0x1000>;
+        interrupt-parent = <&plic>;
+        interrupts = <12>;
+    };
+};

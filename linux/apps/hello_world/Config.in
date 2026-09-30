@@ -1,0 +1,4 @@
+config BR2_PACKAGE_HELLO_WORLD
+    bool "hello-world"
+    help
+      Building a custom RISC-V hello world application.

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# BusyBox runs S script in /etc/init.d/ at boot
+APP_PATH=/usr/bin/hello_world
+SIMEXIT_PATH=/usr/bin/simexit
+
+[ -f "${APP_PATH}" ] || exit 0
+
+umask 077
+
+# Prints a message
+# Runs the program under $APP_PATH
+# The & runs it in the background so that the boot can continue
+start() {
+    echo "Start application: '$APP_PATH'"
+    ( $APP_PATH; $SIMEXIT_PATH ) &
+}
+
+# Runs when the system shuts down
+stop() {
+    killall -q $(basename $APP_PATH)
+}
+
+# Restart = stop, then start again
+restart() {
+    stop
+    start
+}
+
+# BusyBox init calls the script with start, stop and restart
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload)
+        restart
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

@@ -1,0 +1,4 @@
+config BR2_PACKAGE_HCLKTIME
+    bool "hclktime"
+    help
+      Building a custom RISC-V timing library.

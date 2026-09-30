@@ -1,4 +1,13 @@
 #!/bin/env bash
+###############################################################################
+#                                                                             #
+# Copyright 2026 Chiara Ghinami  Nils Bosbach                                 #
+#                                                                             #
+# This software is licensed under the MIT license found in the                #
+# LICENSE file at the root directory of this source tree.                     #
+#                                                                             #
+###############################################################################
+
 set -euo pipefail
 
 # Get directory of script itself

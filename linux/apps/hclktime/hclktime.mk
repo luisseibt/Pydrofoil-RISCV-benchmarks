@@ -1,0 +1,5 @@
+HCLKTIME_VERSION = 1.0
+HCLKTIME_SITE = $(BR2_EXTERNAL_RISCV_APPS_PATH)/hclktime
+HCLKTIME_SITE_METHOD = local
+
+$(eval $(cmake-package))
