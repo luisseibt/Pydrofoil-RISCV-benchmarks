@@ -1,3 +1,9 @@
 [submodule "linux/buildroot"]
 	path = sw/linux/buildroot
 	url = https://gitlab.com/buildroot.org/buildroot.git
+[submodule "baremetal/embench_iot"]
+	path = baremetal/embench_iot
+	url = https://github.com/embench/embench-iot
+[submodule "baremetal/riscv_tests"]
+	path = baremetal/riscv_tests
+	url = https://github.com/riscv-software-src/riscv-tests

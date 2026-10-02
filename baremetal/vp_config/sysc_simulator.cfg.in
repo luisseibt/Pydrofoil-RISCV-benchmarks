@@ -1,0 +1,30 @@
+### Template configuration ####################################################
+system.name       = @NAME@
+system.config     = ${cfg}
+
+system.throttle.rtf = 0
+#system.core.trace = 1
+
+# TLM global quantum, a higher value improves performance but reduces timing
+# accuracy. Use integer values with suffixes s, ms, us or ns.
+# 100 instructions on a call of simulate (1 instr = 1 clk cycle)
+system.quantum = @QUANTUM@
+
+# Clock frequency
+system.clk_cpu.hz = 1000000000 # 1 GHz
+
+### CPU configuration ########################################################
+# Change to "rv64" or "rv32" when using 64b or 32b arch respectively
+system.core.arch_name = "rv@ARCH@"
+system.core.verbose = false
+
+system.core.symbols = @ELF@
+system.core.pc = 0x80000000
+
+# Memory configuration
+system.core.elf = @ELF@
+system.loader.images = @ELF@
+#system.sram.size = 0x10000000    # 256MB
+
+# Terminal configuration
+system.term.backends = stdout

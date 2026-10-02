@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+###############################################################################
+#                                                                             #
+# Copyright 2026 Chiara Ghinami                                               #
+#                                                                             #
+# This software is licensed under the MIT license found in the                #
+# LICENSE file at the root directory of this source tree.                     #
+#                                                                             #
+###############################################################################
+
+set -euo pipefail
+
+# Get directory of script itself
+SOURCE="${BASH_SOURCE[0]}"
+# resolve $SOURCE until the file is no longer a symlink
+while [ -h "$SOURCE" ]; do
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    # if $SOURCE was a relative symlink, we need to resolve it relative to the
+    # path where the symlink file was located
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+BENCHMARK_NAME="${1:-riscv_tests_build.sh}"
+ARCH_TYPE="${2:-64}"
+GSF="${3:-200}"
+BUILD_SCRIPT=""
+
+if [[ $ARCH_TYPE != 32 && $ARCH_TYPE != 64 ]]; then
+    echo "Wrong architecture parameter, it should either be 32 or 64"
+    exit 1
+fi;
+
+if [[ "$BENCHMARK_NAME" == *"embench"* ]]; then
+    BENCHMARK_NAME="embench_iot"
+    BUILD_SCRIPT="embench_build.sh"
+    chmod +x "$DIR/embench_build.sh"
+    echo "Building the embench-iot benchmark for RV$ARCH_TYPE "
+elif [[ "$BENCHMARK_NAME" == *"riscv"* ]]; then
+    BENCHMARK_NAME="riscv_tests"
+    BUILD_SCRIPT="riscv_tests_build.sh"
+    chmod +x "$DIR/riscv_tests_build.sh"
+    echo "Building the riscv_tests benchmark for RV$ARCH_TYPE"
+else
+    echo "The benchmark name is invalid"
+    exit 1
+fi;
+
+PROJECT_ROOT="$DIR/.."
+source "$DIR/setup.sh"
+TAG=baremetal_rv_benchmark
+BUILD_DIR="$PROJECT_ROOT/build/$BENCHMARK_NAME/$ARCH_TYPE"
+
+mkdir -p "$BUILD_DIR"
+
+# Build the chosen test suite
+$CONTAINER_PROGRAM build -t $TAG "$DIR"
+$CONTAINER_PROGRAM run \
+    --rm \
+    $CONTAINER_PROGRAM_FLAGS \
+    -t -e BUILD_SCRIPT="$BUILD_SCRIPT" -e ARCH_TYPE="$ARCH_TYPE" -e GSF="$GSF" \
+    -v "$PROJECT_ROOT/embench_iot:/app/embench_iot:Z" \
+    -v "$PROJECT_ROOT/riscv_tests:/app/riscv_tests:Z" \
+    -v "$PROJECT_ROOT/embench_helper:/app/embench_helper:Z" \
+    -v "$DIR:/app/scripts:Z" \
+    -v "$BUILD_DIR:/app/build:Z" \
+    $TAG \
+    bash -c "/app/scripts/$BUILD_SCRIPT" 
