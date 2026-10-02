@@ -1,2 +1,2 @@
 # RISC-V Benchmarks
-TODO
+This repository collects RISC-V workloads for benchmarking the [Pydrofoil-based SystemC simulator](https://github.com/CGhinami/vcml-pydrofoil), each built reproducibly inside a container. [baremetal](baremetal) builds the riscv-tests and embench-iot suites for RV32 and RV64, and [sw](sw) builds a Buildroot-based Linux image. For for information, please refer to their own README: [sw](sw/README.md) and [baremetal](baremetal/README.md)
