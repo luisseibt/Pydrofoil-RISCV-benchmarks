@@ -15,8 +15,8 @@ CPPFLAGS := -nostdinc -undef -x assembler-with-cpp
 
 CPUS := 1 2 4
 
-# The vcml-pydrofoil platform is single-hart, so it only gets an x1 variant.
-PYDROFOIL_CPUS := 1
+# One device tree per hart count of the vcml-pydrofoil platform (system.ncores)
+PYDROFOIL_CPUS := 1 2 4 8
 
 OBJ += $(addprefix ${O}/pydrofoil-vp-x,${PYDROFOIL_CPUS:=.dtb})
 

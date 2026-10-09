@@ -28,7 +28,8 @@ riscv64-buildroot-linux-gnu-objcopy -O binary $BINARIES_DIR/vmlinux $BUILDROOT_O
 echo "Installing vcml-pydrofoil artifacts"
 cp "/app/files/vp_config/pydrofoil.cfg" "$BUILDROOT_OUT_DIR/"
 cp "$BINARIES_DIR/fw_jump.bin" "$BUILDROOT_OUT_DIR/opensbi_fw_jump.bin"
-make -C /app/files/dt O=$BUILDROOT_OUT_DIR $BUILDROOT_OUT_DIR/pydrofoil-vp-x1.dtb
+# pydrofoil-vp-x{1,2,4,8}.dtb, one per hart count (files/dt/Makefile)
+make -C /app/files/dt O=$BUILDROOT_OUT_DIR
 
 # Thin wrapper next to the RoR ones, so both are launched the same way.
 echo '%include ${dir}/buildroot/pydrofoil.cfg' > "$OUT_DIR/pydrofoil.cfg"

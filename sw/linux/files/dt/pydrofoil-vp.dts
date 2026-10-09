@@ -6,8 +6,69 @@
 #error NRCPU undefined
 #endif
 
-#if NRCPU > 1
-#error "the vcml-pydrofoil platform instantiates a single hart"
+#if NRCPU != 1 && NRCPU != 2 && NRCPU != 4 && NRCPU != 8
+#error "NRCPU must be 1, 2, 4 or 8"
+#endif
+
+/*
+ * One hart: cpu@N with its local interrupt controller hartN. Every hart is
+ * identical, only the index differs.
+ */
+#define HART(n)                                                         \
+        cpu@n {                                                         \
+            reg = <n>;                                                  \
+            clock-frequency = <1000000000>; /* 1 GHz */                 \
+            compatible = "riscv";                                       \
+            device_type = "cpu";                                        \
+            d-cache-block-size = <0x40>;                                \
+            d-cache-sets = <0x80>;                                      \
+            d-cache-size = <0x8000>;                                    \
+            d-tlb-sets = <0x01>;                                        \
+            d-tlb-size = <0x20>;                                        \
+            i-cache-block-size = <0x40>;                                \
+            i-cache-sets = <0x80>;                                      \
+            i-cache-size = <0x8000>;                                    \
+            i-tlb-sets = <0x01>;                                        \
+            i-tlb-size = <0x20>;                                        \
+            mmu-type = "riscv,sv39";                                    \
+            riscv,isa = "rv64imafdc_zicsr_zifencei_zba_zbb";            \
+            riscv,isa-base = "rv64i";                                   \
+            riscv,isa-extensions = "i", "m", "a", "f", "d", "c",        \
+                                   "zicsr", "zifencei", "zba", "zbb";   \
+            tlb-split;                                                  \
+                                                                        \
+            hart##n: interrupt-controller {                             \
+                #interrupt-cells = <1>;                                 \
+                compatible = "riscv,cpu-intc";                          \
+                interrupt-controller;                                   \
+            };                                                          \
+        };
+
+/*
+ * Per hart: CLINT software (3) and timer (7) interrupt, PLIC M-mode (11) and
+ * S-mode (9) external interrupt. The VP binds clint.irq_sw/irq_timer[i] and
+ * plic.irqt[2i] / irqt[2i+1] to hart i, in this order.
+ */
+#if NRCPU == 1
+#define CLINT_IRQS <&hart0 3>, <&hart0 7>
+#define PLIC_IRQS  <&hart0 11>, <&hart0 9>
+#elif NRCPU == 2
+#define CLINT_IRQS <&hart0 3>, <&hart0 7>, <&hart1 3>, <&hart1 7>
+#define PLIC_IRQS  <&hart0 11>, <&hart0 9>, <&hart1 11>, <&hart1 9>
+#elif NRCPU == 4
+#define CLINT_IRQS <&hart0 3>, <&hart0 7>, <&hart1 3>, <&hart1 7>, \
+                   <&hart2 3>, <&hart2 7>, <&hart3 3>, <&hart3 7>
+#define PLIC_IRQS  <&hart0 11>, <&hart0 9>, <&hart1 11>, <&hart1 9>, \
+                   <&hart2 11>, <&hart2 9>, <&hart3 11>, <&hart3 9>
+#else
+#define CLINT_IRQS <&hart0 3>, <&hart0 7>, <&hart1 3>, <&hart1 7>, \
+                   <&hart2 3>, <&hart2 7>, <&hart3 3>, <&hart3 7>, \
+                   <&hart4 3>, <&hart4 7>, <&hart5 3>, <&hart5 7>, \
+                   <&hart6 3>, <&hart6 7>, <&hart7 3>, <&hart7 7>
+#define PLIC_IRQS  <&hart0 11>, <&hart0 9>, <&hart1 11>, <&hart1 9>, \
+                   <&hart2 11>, <&hart2 9>, <&hart3 11>, <&hart3 9>, \
+                   <&hart4 11>, <&hart4 9>, <&hart5 11>, <&hart5 9>, \
+                   <&hart6 11>, <&hart6 9>, <&hart7 11>, <&hart7 9>
 #endif
 
 /dts-v1/;
@@ -33,34 +94,20 @@
 
         timebase-frequency = <10000000>; // 10 MHz
 
-        cpu@0 {
-            reg = <0>;
-            clock-frequency = <1000000000>; // 1 GHz
-            compatible = "riscv";
-            device_type = "cpu";
-            d-cache-block-size = <0x40>;
-            d-cache-sets = <0x80>;
-            d-cache-size = <0x8000>;
-            d-tlb-sets = <0x01>;
-            d-tlb-size = <0x20>;
-            i-cache-block-size = <0x40>;
-            i-cache-sets = <0x80>;
-            i-cache-size = <0x8000>;
-            i-tlb-sets = <0x01>;
-            i-tlb-size = <0x20>;
-            mmu-type = "riscv,sv39";
-            riscv,isa = "rv64imafdc_zicsr_zifencei_zba_zbb";
-            riscv,isa-base = "rv64i";
-            riscv,isa-extensions = "i", "m", "a", "f", "d", "c",
-                                   "zicsr", "zifencei", "zba", "zbb";
-            tlb-split;
-
-            hart0: interrupt-controller {
-                #interrupt-cells = <1>;
-                compatible = "riscv,cpu-intc";
-                interrupt-controller;
-            };
-        };
+        HART(0)
+#if NRCPU > 1
+        HART(1)
+#endif
+#if NRCPU > 2
+        HART(2)
+        HART(3)
+#endif
+#if NRCPU > 4
+        HART(4)
+        HART(5)
+        HART(6)
+        HART(7)
+#endif
     };
 
     memory@80000000 {
@@ -90,7 +137,7 @@
     clint@2000000 {
         compatible = "sifive,clint0", "riscv,clint0";
         reg = <0x0 0x02000000 0x0 0x000c0000>;
-        interrupts-extended = <&hart0 3>, <&hart0 7>;
+        interrupts-extended = CLINT_IRQS;
     };
 
     plic: interrupt-controller@c000000 {
@@ -100,11 +147,11 @@
         compatible = "sifive,plic-1.0.0", "riscv,plic0";
         interrupt-controller;
         /*
-         * Context 0 = hart0 M-external (OpenSBI), context 1 = hart0
-         * S-external (Linux). The platform binds plic.irqt[0] and
-         * plic.irqt[1] to the core's MEIP and SEIP inputs in that order.
+         * Context 2i = hart i M-external (OpenSBI), context 2i+1 = hart i
+         * S-external (Linux). The platform binds plic.irqt[2i] and
+         * plic.irqt[2i+1] to hart i's MEIP and SEIP inputs in that order.
          */
-        interrupts-extended = <&hart0 11>, <&hart0 9>;
+        interrupts-extended = PLIC_IRQS;
         riscv,ndev = <64>;
     };
 
