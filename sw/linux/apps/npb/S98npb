@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# Runs one NPB benchmark during boot if /etc/npb_job exists, e.g.
+#   NPB_BENCH=cg.W
+#   OMP_NUM_THREADS=4
+# The host side (vcml-pydrofoil benchmark/benchmark.py) writes that file into
+# a fresh copy of rootfs.ext4 for every run. The benchmark runs in the
+# foreground, afterwards S99hello_world calls simexit and the simulation ends.
+# Without /etc/npb_job nothing happens.
+#
+# The output carries markers the host parses:
+#   NPB_HCLK_START=<us> / NPB_HCLK_END=<us>  host wall clock (simdev hclk)
+#   NPB_EXIT=<exit code of the benchmark>
+
+JOB=/etc/npb_job
+
+start() {
+    [ -f "$JOB" ] || return 0
+    . "$JOB"
+    export OMP_NUM_THREADS
+
+    BIN=/usr/bin/npb/${NPB_BENCH}.x
+    if [ ! -x "$BIN" ]; then
+        echo "NPB: $BIN not found"
+        echo "NPB_EXIT=127"
+        return 0
+    fi
+
+    echo "NPB: running $NPB_BENCH with OMP_NUM_THREADS=$OMP_NUM_THREADS"
+    echo "NPB_HCLK_START=$(hclk)"
+    "$BIN"
+    rc=$?
+    echo "NPB_HCLK_END=$(hclk)"
+    echo "NPB_EXIT=$rc"
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop|restart|reload)
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit 0

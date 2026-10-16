@@ -1,0 +1,12 @@
+config BR2_PACKAGE_NPB
+    bool "npb"
+    depends on BR2_TOOLCHAIN_HAS_FORTRAN
+    depends on BR2_TOOLCHAIN_HAS_OPENMP
+    help
+      NAS Parallel Benchmarks 3.3.1, OpenMP version (NPB3.3-OMP).
+      Installs /usr/bin/npb/<bench>.<class>.x for the benchmarks in
+      NPB_BENCHMARKS and the classes in NPB_CLASSES (npb.mk), and the
+      init script S98npb that runs the job described in /etc/npb_job.
+
+comment "npb needs a toolchain w/ Fortran and OpenMP"
+    depends on !BR2_TOOLCHAIN_HAS_FORTRAN || !BR2_TOOLCHAIN_HAS_OPENMP
